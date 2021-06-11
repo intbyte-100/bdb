@@ -1,3 +1,0 @@
-/home/intbyte/CLionProjects/bdb7/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/intbyte/CLionProjects/bdb7/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/intbyte/CLionProjects/bdb7/cmake-build-debug/CMakeFiles/bdb7.dir
