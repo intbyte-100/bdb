@@ -18,16 +18,16 @@ void bdb::DataBuffer::disable(byte attribute) {
 
 bool bdb::DataBuffer::isEnable(byte attribute) {
     byte cfg = config;
-    if(attribute != ZIP) cfg &= ~ZIP;
-    if(attribute != REF_32_BIT) cfg &= ~REF_32_BIT;
+    if (attribute != ZIP) cfg &= ~ZIP;
+    if (attribute != REF_32_BIT) cfg &= ~REF_32_BIT;
     return attribute == cfg;
 }
 
 std::vector<byte> bdb::DataBuffer::write(bdb::ObjectInstance *objectInstance) {
     std::vector<byte> wroteData;
-    std::vector<ObjectPool*> objectPools;
+    std::vector<ObjectPool *> objectPools;
     updatePool();
-    pool[objectInstance->parent-LAST_BASE_TYPE-1].put(objectInstance, pool, &objectPools);
+    pool[objectInstance->parent - LAST_BASE_TYPE - 1].put(objectInstance, pool, &objectPools);
     std::vector<byte> byteBuffer;
     std::vector<byte> serializedObject;
 
@@ -45,7 +45,7 @@ std::vector<byte> bdb::DataBuffer::write(bdb::ObjectInstance *objectInstance) {
         putPrimitivesToBuffer(DOUBLE, double, objectPool->doubles)
         putPrimitivesToBuffer(LONG, long, objectPool->longs)
 
-        if(!objectPool->instances.empty()) {
+        if (!objectPool->instances.empty()) {
             buffer::put<byte>(OBJECT, &serializedObject);
             buffer::put<unsigned short>(objectPool->instances.size(), &serializedObject);
             for (int i = 0; i < objectPool->instances.size(); i++) {
@@ -62,17 +62,25 @@ std::vector<byte> bdb::DataBuffer::write(bdb::ObjectInstance *objectInstance) {
 
 bdb::ObjectInstance *bdb::DataBuffer::read(std::vector<byte> &data, byte declarationID) {
     unsigned int index = 0;
+    std::vector<ObjectPool *> usedPools;
     updatePool();
-    while (true){
+    while (index != data.size()) {
         unsigned int bufferIndex = index;
 
         auto id = buffer::get<byte>(&data, bufferIndex);
         auto normalizedID = id - LAST_BASE_TYPE - 1;
         auto countObject = buffer::get<unsigned short>(&data, bufferIndex);
         auto objectPool = &pool[normalizedID];
+        objectPool->declarationID = id;
+        objectPool->size = countObject;
         index = bufferIndex;
-        unsigned int objectsLastIndex = index+declarations[normalizedID]->size*countObject+declarations[normalizedID]->manifestSize;
-        while (true) {
+        unsigned int objectsLastIndex =
+                index + declarations[normalizedID]->size * countObject +
+                declarations[normalizedID]->manifestSize;
+
+        usedPools.push_back(objectPool);
+
+        while (bufferIndex != objectsLastIndex) {
             auto type = buffer::get<byte>(&data, bufferIndex);
             auto count = buffer::get<unsigned short>(&data, bufferIndex);
             switch (type) {
@@ -108,20 +116,27 @@ bdb::ObjectInstance *bdb::DataBuffer::read(std::vector<byte> &data, byte declara
                     break;
                 }
                 case GENERALIZING_MAP:
-                case TYPED_MAP: break;
-                default: throw std::runtime_error(std::string("unknown type "+std::to_string((int) type)+": element index = "+std::to_string(bufferIndex)+"; object id "+std::to_string(id)));
+                case TYPED_MAP:
+                    break;
+                default:
+                    throw std::runtime_error(std::string(
+                            "unknown type " + std::to_string((int) type) + ": element index = " +
+                            std::to_string(bufferIndex) + "; object id " + std::to_string(id)));
             }
-            if(bufferIndex == objectsLastIndex) break;
         }
         index = bufferIndex;
-        if(index == data.size()) break;
     }
-    return nullptr;
+
+    for (auto i: usedPools) i->structureDataToObjects();
+    for (auto i: usedPools){
+        i->flush(pool);
+    }
+    return pool[declarationID-1-LAST_BASE_TYPE].objects[0];
 }
 
 
 void bdb::DataBuffer::updatePool() {
-    if(pool == nullptr || poolSize < declarations.size()){
+    if (pool == nullptr || poolSize < declarations.size()) {
         delete[] pool;
         poolSize = declarations.size();
         pool = new ObjectPool[poolSize];

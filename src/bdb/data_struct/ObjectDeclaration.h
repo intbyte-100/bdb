@@ -25,7 +25,7 @@ namespace bdb {
         byte regLong();
         byte regObject(ObjectDeclaration *objectDeclaration, bool nullByDefault);
         void reg();
-        ObjectInstance* newInstance() const;
+        ObjectInstance* newInstance(bool feelInstancesWithNulls = false) const;
 
     };
 }

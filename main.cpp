@@ -10,9 +10,13 @@ int main() {
 
     auto entity = new bdb::ObjectDeclaration();
     auto entity2 = new bdb::ObjectDeclaration();
-    byte i = entity2->regInt();
+    byte i = entity2->regLong();
+    byte i3 = entity2->regLong();
     entity->regFloat();
     entity->regObject(entity2, false);
+    entity->regObject(entity2, true);
+
+
     entity->reg();
     entity2->reg();
 
