@@ -33,7 +33,19 @@ void bdb::ObjectPool::put(ObjectInstance *instance, ObjectPool *pool, std::vecto
             instances.push_back(nullref);
             continue;
         }
+
         pool[object->parent-LAST_BASE_TYPE-1].put(object, pool, objectPools);
         instances.push_back(object->reference);
     }
+}
+
+void bdb::ObjectPool::clear() {
+    bytes.clear();
+    shorts.clear();
+    integers.clear();
+    floats.clear();
+    doubles.clear();
+    longs.clear();
+    instances.clear();
+    parentInstances.clear();
 }

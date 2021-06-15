@@ -23,7 +23,6 @@ namespace bdb {
         ~DataBuffer();
     };
 
-
 }
 
 

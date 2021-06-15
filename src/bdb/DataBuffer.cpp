@@ -45,49 +45,76 @@ std::vector<byte> bdb::DataBuffer::write(bdb::ObjectInstance *objectInstance) {
         putPrimitivesToBuffer(DOUBLE, double, objectPool->doubles)
         putPrimitivesToBuffer(LONG, long, objectPool->longs)
 
-        buffer::put<byte>(OBJECT, &serializedObject);
-        buffer::put<unsigned short>(objectPool->instances.size(), &serializedObject);
-        for (int i = 0; i < objectPool->instances.size(); i++) {
-            buffer::put<byte>(objectPool->parentInstances[i], &serializedObject);
-            buffer::put<unsigned short>(objectPool->instances[i], &serializedObject);
+        if(!objectPool->instances.empty()) {
+            buffer::put<byte>(OBJECT, &serializedObject);
+            buffer::put<unsigned short>(objectPool->instances.size(), &serializedObject);
+            for (int i = 0; i < objectPool->instances.size(); i++) {
+                buffer::put<byte>(objectPool->parentInstances[i], &serializedObject);
+                buffer::put<unsigned short>(objectPool->instances[i], &serializedObject);
+            }
         }
-        buffer::merge(&wroteData, serializedObject);
+        buffer::merge(&wroteData, &serializedObject);
+        objectPool->clear();
     }
     return wroteData;
 }
 
 
 bdb::ObjectInstance *bdb::DataBuffer::read(std::vector<byte> &data, byte declarationID) {
-    unsigned long index = 0;
+    unsigned int index = 0;
     updatePool();
     while (true){
-        unsigned int bufferIndex = 0;
+        unsigned int bufferIndex = index;
 
         auto id = buffer::get<byte>(&data, bufferIndex);
         auto normalizedID = id - LAST_BASE_TYPE - 1;
         auto countObject = buffer::get<unsigned short>(&data, bufferIndex);
-        auto objectPool = pool[normalizedID];
-        index += 3;
+        auto objectPool = &pool[normalizedID];
+        index = bufferIndex;
+        unsigned int objectsLastIndex = index+declarations[normalizedID]->size*countObject+declarations[normalizedID]->manifestSize;
         while (true) {
             auto type = buffer::get<byte>(&data, bufferIndex);
             auto count = buffer::get<unsigned short>(&data, bufferIndex);
             switch (type) {
-                case BYTE:
-
-
+                case BYTE: {
+                    objectPool->bytes = buffer::get<signed_byte>(count, &data, bufferIndex);
                     break;
-                case SHORT: break;
-                case INT: break;
-                case FLOAT: break;
-                case DOUBLE: break;
-                case LONG: break;
-                case OBJECT: break;
-                case GENERALIZING_MAP: break;
+                }
+                case SHORT: {
+                    objectPool->shorts = buffer::get<short>(count, &data, bufferIndex);
+                    break;
+                }
+                case INT: {
+                    objectPool->integers = buffer::get<int>(count, &data, bufferIndex);
+                    break;
+                }
+                case FLOAT: {
+                    objectPool->floats = buffer::get<float>(count, &data, bufferIndex);
+                    break;
+                }
+                case DOUBLE: {
+                    objectPool->doubles = buffer::get<double>(count, &data, bufferIndex);
+                    break;
+                }
+                case LONG: {
+                    objectPool->longs = buffer::get<long>(count, &data, bufferIndex);
+                    break;
+                }
+                case OBJECT: {
+                    for (int i = 0; i < count; i++) {
+                        objectPool->parentInstances.push_back(buffer::get<byte>(&data, bufferIndex));
+                        objectPool->instances.push_back(buffer::get<unsigned short>(&data, bufferIndex));
+                    }
+                    break;
+                }
+                case GENERALIZING_MAP:
                 case TYPED_MAP: break;
                 default: throw std::runtime_error(std::string("unknown type "+std::to_string((int) type)+": element index = "+std::to_string(bufferIndex)+"; object id "+std::to_string(id)));
             }
+            if(bufferIndex == objectsLastIndex) break;
         }
-        if(++index > data.size()) break;
+        index = bufferIndex;
+        if(index == data.size()) break;
     }
     return nullptr;
 }

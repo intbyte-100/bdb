@@ -78,12 +78,15 @@ namespace bdb {
         template<typename T>
         std::vector<T> get(unsigned int size, std::vector<byte> *byteVector,unsigned int &index){
             std::vector<T> value;
-            while (value.size() != size) value.push_back(get<T>(byteVector, index));
+            while (value.size() < size){
+                value.push_back(get<T>(byteVector, index));
+            }
+            return value;
         }
 
         template<typename T>
-        void merge(std::vector<T> *first, const std::vector<T> &second){
-            for (auto item: second) {
+        void merge(std::vector<T> *first, const std::vector<T> *second){
+            for (auto item: *second) {
                 first->push_back(item);
             }
         }

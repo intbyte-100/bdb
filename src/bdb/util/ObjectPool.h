@@ -8,7 +8,7 @@ namespace bdb {
     private:
         bool usedBefore = false;
         unsigned short lastReference = 0;
-        unsigned short size = 1;
+        unsigned short size = 0;
         byte declarationID;
         std::vector<unsigned short> instances;
         std::vector<byte> parentInstances;
@@ -20,6 +20,7 @@ namespace bdb {
         std::vector<long> longs;
     public:
         void put(ObjectInstance *instance, ObjectPool* pool, std::vector<ObjectPool*>* objectPools);
+        void clear();
     };
 }
 
