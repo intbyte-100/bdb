@@ -26,4 +26,6 @@ add_executable(bdb7
         src/bdb/data_struct/Map.h
         src/bdb/util/ObjectPool.cpp
         src/bdb/util/ObjectPool.h
-        src/bdb/util/ObjectPool.cpp)
+        src/bdb/util/ObjectPool.cpp
+        src/bdb/util/macros_foreach.h
+        )
