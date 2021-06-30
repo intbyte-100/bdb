@@ -29,12 +29,12 @@ byte bdb::ObjectDeclaration::regLong() {
 
 void bdb::ObjectDeclaration::reg() {
     declarations.push_back(this);
-    reference = declarations.size()+LAST_BASE_TYPE;
+    reference = declarations.size()-1;
 }
 
-bdb::ObjectInstance *bdb::ObjectDeclaration::newInstance(bool feelInstancesWithNulls) const {
+std::shared_ptr<bdb::ObjectInstance> bdb::ObjectDeclaration::newInstance(bool feelInstancesWithNulls) const {
     auto instance = getInstance();
-    instance->reference = nullref;
+    instance->reference = null_ref;
     for (int i = 0; i < byteCount; ++i) instance->bytes.push_back(0);
     for (int i = 0; i < shortCount; ++i) instance->shorts.push_back(0);
     for (int i = 0; i < intCount; ++i) instance->integers.push_back(0);

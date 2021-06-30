@@ -1,9 +1,9 @@
 #include "ObjectPool.h"
 #include "utils.h"
 
-void bdb::ObjectPool::put(ObjectInstance *instance, ObjectPool *pool, std::vector<ObjectPool *> *objectPools) {
+void bdb::ObjectPool::put(std::shared_ptr<ObjectInstance> instance, ObjectPool *pool, std::vector<ObjectPool *> *objectPools) {
     size++;
-    if (instance->reference != nullref) return;
+    if (instance->reference != null_ref) return;
     instance->reference = lastReference++;
     if (!usedBefore) {
         usedBefore = true;
@@ -26,15 +26,15 @@ void bdb::ObjectPool::put(ObjectInstance *instance, ObjectPool *pool, std::vecto
 
 
     for (int i = 0; i < instance->instances.size(); i++) {
-        parentInstances.push_back(declarations[instance->parent - LAST_BASE_TYPE - 1]->references[i]->reference);
+        parentInstances.push_back(declarations[instance->parent]->references[i]->reference);
 
         auto object = instance->instances[i];
         if (object == nullptr) {
-            instances.push_back(nullref);
+            instances.push_back(null_ref);
             continue;
         }
 
-        pool[object->parent - LAST_BASE_TYPE - 1].put(object, pool, objectPools);
+        pool[object->parent].put(object, pool, objectPools);
         instances.push_back(object->reference);
     }
 }
@@ -55,7 +55,7 @@ void bdb::ObjectPool::clear() {
 void bdb::ObjectPool::structureDataToObjects() {
     unsigned short byteVectorIndex = 0, shortVectorIndex = 0, intVectorIndex = 0, floatVectorIndex = 0, doubleVectorIndex = 0, longVectorIndex = 0;
     for (int i = 0; i < size; i++) {
-        auto declaration = declarations[declarationID - 1 - LAST_BASE_TYPE];
+        auto declaration = declarations[declarationID];
         auto instance = declaration->newInstance(true);
 
         for (int j = 0; j < declaration->byteCount; j++)
@@ -76,17 +76,17 @@ void bdb::ObjectPool::structureDataToObjects() {
 
 void bdb::ObjectPool::flush(ObjectPool *pool) {
 
-    auto declaration = declarations[declarationID - 1 - LAST_BASE_TYPE];
+    auto declaration = declarations[declarationID];
     unsigned short objectVectorIndex = 0;
     for (auto object : objects) {
         for (int j = 0; j < declaration->references.size(); j++) {
-            if (instances[objectVectorIndex] == nullref) {
+            if (instances[objectVectorIndex] == null_ref) {
                 object->instances[j] = nullptr;
                 objectVectorIndex++;
                 continue;
             }
             object->instances[j] =
-                    pool[parentInstances[objectVectorIndex] - LAST_BASE_TYPE - 1]
+                    pool[parentInstances[objectVectorIndex]]
                             .objects[instances[objectVectorIndex]];
             objectVectorIndex++;
         }

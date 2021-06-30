@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "../bdb.h"
 
 
@@ -16,7 +17,7 @@ namespace bdb {
         std::vector<float> floats;
         std::vector<double> doubles;
         std::vector<long> longs;
-        std::vector<ObjectInstance*> instances;
+        std::vector<std::shared_ptr<ObjectInstance>> instances;
     public:
         void free();
     };

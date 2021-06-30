@@ -23,9 +23,17 @@ namespace bdb {
         byte regFloat();
         byte regDouble();
         byte regLong();
+
+        byte regByteArray();
+        byte regShortArray();
+        byte regIntArray();
+        byte regFloatArray();
+        byte regDoubleArray();
+        byte regLongArray();
+
         byte regObject(ObjectDeclaration *objectDeclaration, bool nullByDefault);
         void reg();
-        ObjectInstance* newInstance(bool feelInstancesWithNulls = false) const;
+        std::shared_ptr<ObjectInstance> newInstance(bool feelInstancesWithNulls = false) const;
 
     };
 }

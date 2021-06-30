@@ -23,11 +23,11 @@ bool bdb::DataBuffer::isEnable(byte attribute) {
     return attribute == cfg;
 }
 
-std::vector<byte> bdb::DataBuffer::write(bdb::ObjectInstance *objectInstance) {
+std::vector<byte> bdb::DataBuffer::write(std::shared_ptr<bdb::ObjectInstance> objectInstance) {
     std::vector<byte> wroteData;
     std::vector<ObjectPool *> objectPools;
     updatePool();
-    pool[objectInstance->parent - LAST_BASE_TYPE - 1].put(objectInstance, pool, &objectPools);
+    pool[objectInstance->parent].put(objectInstance, pool, &objectPools);
     std::vector<byte> byteBuffer;
     std::vector<byte> serializedObject;
 
@@ -60,7 +60,7 @@ std::vector<byte> bdb::DataBuffer::write(bdb::ObjectInstance *objectInstance) {
 }
 
 
-bdb::ObjectInstance *bdb::DataBuffer::read(std::vector<byte> &data, byte declarationID) {
+std::shared_ptr<bdb::ObjectInstance> bdb::DataBuffer::read(std::vector<byte> &data, byte declarationID) {
     unsigned int index = 0;
     std::vector<ObjectPool *> usedPools;
     updatePool();
@@ -68,15 +68,14 @@ bdb::ObjectInstance *bdb::DataBuffer::read(std::vector<byte> &data, byte declara
         unsigned int bufferIndex = index;
 
         auto id = buffer::get<byte>(&data, bufferIndex);
-        auto normalizedID = id - LAST_BASE_TYPE - 1;
         auto countObject = buffer::get<unsigned short>(&data, bufferIndex);
-        auto objectPool = &pool[normalizedID];
+        auto objectPool = &pool[id];
         objectPool->declarationID = id;
         objectPool->size = countObject;
         index = bufferIndex;
         unsigned int objectsLastIndex =
-                index + declarations[normalizedID]->size * countObject +
-                declarations[normalizedID]->manifestSize;
+                index + declarations[id]->size * countObject +
+                declarations[id]->manifestSize;
 
         usedPools.push_back(objectPool);
 
@@ -131,7 +130,7 @@ bdb::ObjectInstance *bdb::DataBuffer::read(std::vector<byte> &data, byte declara
     for (auto i: usedPools){
         i->flush(pool);
     }
-    return pool[declarationID-1-LAST_BASE_TYPE].objects[0];
+    return pool[declarationID].objects[0];
 }
 
 

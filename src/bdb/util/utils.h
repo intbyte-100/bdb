@@ -12,7 +12,7 @@ namespace bdb {
     extern std::vector<ObjectDeclaration *> declarations;
 
 
-    ObjectInstance *getInstance();
+    std::shared_ptr<ObjectInstance> getInstance();
 
     template<typename T>
     byte getTypeCode(){

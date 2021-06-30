@@ -1,7 +1,7 @@
 #include <iostream>
 #include "src/bdb/DataBuffer.h"
 #include "src/bdb/data_struct/ObjectDeclaration.h"
-#include "src/bdb/data_struct/TypedMap.h"
+
 
 
 bdbClass(Entity,

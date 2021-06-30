@@ -5,7 +5,7 @@
 
 
 unsigned int bdb::poolSize = 16;
-unsigned short bdb::nullref = 65535;
+unsigned short bdb::null_ref = 65535;
 
 void bdb::update() {
     for (auto declaration: declarations) {

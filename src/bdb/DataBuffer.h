@@ -15,8 +15,8 @@ namespace bdb {
         byte poolSize = 0;
     public:
         void updatePool();
-        std::vector<byte> write(ObjectInstance* objectInstance);
-        ObjectInstance* read(std::vector<byte> &data, byte declarationID);
+        std::vector<byte> write(std::shared_ptr<ObjectInstance> instance);
+        std::shared_ptr<ObjectInstance> read(std::vector<byte> &data, byte declarationID);
         void enable(byte attribute);
         void disable(byte attribute);
         bool isEnable(byte attribute);

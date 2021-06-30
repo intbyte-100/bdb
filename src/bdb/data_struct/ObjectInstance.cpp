@@ -9,10 +9,6 @@ void bdb::ObjectInstance::free() {
     doubles.clear();
     longs.clear();
     instances.clear();
-    if(instances.size() < poolSize)
-        instances.push_back(this);
-    else
-        delete this;
 }
 
 
