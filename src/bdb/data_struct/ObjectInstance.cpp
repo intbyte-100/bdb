@@ -1,14 +1,18 @@
 #include "ObjectInstance.h"
-#include "../util/utils.h"
 
-void bdb::ObjectInstance::free() {
-    bytes.clear();
-    shorts.clear();
-    integers.clear();
-    floats.clear();
-    doubles.clear();
-    longs.clear();
-    instances.clear();
+#define deleteIfNotNull(name)                                                                                          \
+    if (name != nullptr) {                                                                                             \
+        for (auto i : *name) {                                                                                         \
+            delete i;                                                                                                  \
+        }                                                                                                              \
+        delete name;                                                                                                   \
+    }
+
+bdb::ObjectInstance::~ObjectInstance() {
+    deleteIfNotNull(byteArrays);
+    deleteIfNotNull(shortArrays);
+    deleteIfNotNull(intArrays);
+    deleteIfNotNull(floatArrays);
+    deleteIfNotNull(doubleArrays);
+    deleteIfNotNull(longArrays);
 }
-
-

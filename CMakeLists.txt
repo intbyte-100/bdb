@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 set(CMAKE_CXX_STANDARD 14)
 
 
@@ -23,15 +21,14 @@ add_executable(bdb7
         src/bdb/util/utils.h
         src/bdb/data_struct/ObjectDeclaration.cpp
         src/bdb/data_struct/ObjectDeclaration.h
-        src/bdb/data_struct/GeneralizingMap.cpp
-        src/bdb/data_struct/GeneralizingMap.h
-        src/bdb/data_struct/TypedMap.cpp
-        src/bdb/data_struct/TypedMap.h
+
+
         src/bdb/data_struct/Serializable.h
-        src/bdb/data_struct/Map.cpp
-        src/bdb/data_struct/Map.h
-        src/bdb/util/ObjectPool.cpp
-        src/bdb/util/ObjectPool.h
-        src/bdb/util/ObjectPool.cpp
+
+        src/bdb/util/ObjectCache.cpp
+        src/bdb/util/ObjectCache.h
+        src/bdb/util/ObjectCache.cpp
         src/bdb/util/macros_foreach.h
-        )
+        src/bdb/util/ArrayBuffer.h
+        src/bdb/util/ArrayBuffer.cpp
+)

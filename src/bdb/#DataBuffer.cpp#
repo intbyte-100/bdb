@@ -15,10 +15,8 @@ void bdb::DataBuffer::disable(byte attribute) { config &= ~attribute; }
 
 bool bdb::DataBuffer::isEnable(byte attribute) {
     byte cfg = config;
-    if (attribute != COMPRESSING)
-        cfg &= ~COMPRESSING;
-    if (attribute != THIRTY_TWO_BIT_POINTERS)
-        cfg &= ~THIRTY_TWO_BIT_POINTERS;
+    if (attribute != ZIP) cfg &= ~ZIP;
+    if (attribute != REF_32_BIT) cfg &= ~REF_32_BIT;
     return attribute == cfg;
 }
 

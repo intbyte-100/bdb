@@ -25,28 +25,28 @@ void regBytes() {                                                               
 FOR_EACH(bdbByteGetter, __VA_ARGS__)
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#define bdbShortReg(name) name = object->regShort();
+#define bdbShortReg(name) byte name = object->regShort();
 #define bdbShortGetter(name) inline short& name(const std::shared_ptr<bdb::ObjectInstance> &instance) {    \
     return instance->shorts[variables::name];                                       \
 }
-#define bdbShorts(...) namespace variables { FOR_EACH(bdbVar, __VA_ARGS__) }        \
-void regShorts() {                                                                  \
-    using namespace variables;                                                      \
-    FOR_EACH(bdbShortReg, __VA_ARGS__)                                              \
-}                                                                                   \
-FOR_EACH(bdbShortGetter, __VA_ARGS__)
+#define bdbShorts(...)                                                                                                 \
+    namespace variables {                                                                                              \
+        FOR_EACH(bdbShortReg, __VA_ARGS__)                                                                             \
+    }                                                                                                                  \
+                                                                                                                       \
+    FOR_EACH(bdbShortGetter, __VA_ARGS__)
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#define bdbIntReg(name) name = object->regInt();
+#define bdbIntReg(name) byte name = object->regInt();
 #define bdbIntGetter(name) inline int& name(const std::shared_ptr<bdb::ObjectInstance> &instance) {        \
     return instance->integers[variables::name];                                     \
 }
-#define bdbInts(...) namespace variables { FOR_EACH(bdbVar, __VA_ARGS__) }          \
-void regInts() {                                                                    \
-    using namespace variables;                                                      \
-    FOR_EACH(bdbIntReg, __VA_ARGS__)                                                \
-}                                                                                   \
-FOR_EACH(bdbIntGetter, __VA_ARGS__)
+#define bdbInts(...)                                                                                                   \
+    namespace variables {                                                                                              \
+        FOR_EACH(bdbIntReg, __VA_ARGS__)                                                                               \
+    }                                                                                                                  \
+                                                                                                                       \
+    FOR_EACH(bdbIntGetter, __VA_ARGS__)
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #define bdbFloatReg(name) name = object->regFloat();
@@ -66,12 +66,15 @@ FOR_EACH(bdbFloatGetter, __VA_ARGS__)
 #define bdbDoubleGetter(name) inline double& name(const std::shared_ptr<bdb::ObjectInstance> &instance) {  \
     return instance->doubles[variables::name];                                      \
 }
-#define bdbDoubles(...) namespace variables { FOR_EACH(bdbVar, __VA_ARGS__) }       \
-void regDoubles() {                                                                  \
-    using namespace variables;                                                      \
-    FOR_EACH(bdbDoubleReg, __VA_ARGS__)                                             \
-}                                                                                   \
-FOR_EACH(bdbDoubleGetter, __VA_ARGS__)
+#define bdbDoubles(...)                                                                                      \
+	namespace variables {                                                                                    \
+	FOR_EACH(bdbVar, __VA_ARGS__)                                                                            \
+	}                                                                                                        \
+	void regDoubles() {                                                                                      \
+		using namespace variables;                                                                           \
+		FOR_EACH(bdbDoubleReg, __VA_ARGS__)                                                                  \
+	}                                                                                                        \
+	FOR_EACH(bdbDoubleGetter, __VA_ARGS__)
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -87,17 +90,29 @@ void regLongs() {                                                              \
 FOR_EACH(bdbLongGetter, __VA_ARGS__)
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#define bdbObjectGetter(name)                                                                                          \
+    inline std::shared_ptr<bdb::ObjectInstance> &name(const std::shared_ptr<bdb::ObjectInstance> &instance) {          \
+        return instance->objects[variables::name];                                                                     \
+    }
+#define bdbObject(name, declaration, feelWithNulls)                                                                    \
+    namespace variables {                                                                                              \
+        byte name = object->regObject(declaration, feelWithNulls);                                                     \
+    }                                                                                                                  \
+    bdbObjectGetter(name)
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 typedef uint8_t byte;
 typedef char signed_byte;
 
 namespace bdb {
 
-
     const byte version = 1;
-    const byte ZIP = 0x01;
-    const byte REF_32_BIT = 0x02;
 
-
+    // flags
+    const byte COMPRESSING = 0x01;
+    const byte THIRTY_TWO_BIT_POINTERS = 0x02;
 
     const byte BYTE = 0;
     const byte SHORT = 1;
@@ -108,14 +123,16 @@ namespace bdb {
     const byte GENERALIZING_MAP = 6;
     const byte TYPED_MAP = 7;
     const byte OBJECT = 8;
-    const byte BYTE_ARRAY = 9;
-    const byte SHORT_ARRAY = 10;
-    const byte INT_ARRAY = 11;
-    const byte FLOAT_ARRAY = 12;
-    const byte DOUBLE_ARRAY = 13;
-    const byte LONG_ARRAY = 14;
+    const byte POINTER = 9;
 
-    extern unsigned int poolSize;
+    const byte BYTE_ARRAY = 0;
+    const byte SHORT_ARRAY = 1;
+    const byte INT_ARRAY = 2;
+    const byte FLOAT_ARRAY = 3;
+    const byte DOUBLE_ARRAY = 4;
+    const byte LONG_ARRAY = 5;
+    const byte OBJECT_ARRAY = 6;
+
     extern unsigned short null_ref;
 
 

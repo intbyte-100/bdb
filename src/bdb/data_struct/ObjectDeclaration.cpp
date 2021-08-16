@@ -1,7 +1,13 @@
 #include "ObjectDeclaration.h"
 #include "../util/utils.h"
 
+#define fori(var) for(int i = 0; i < var; i++)
 
+#define initArrays(arrayType, arrayName, arrayCount)                                                                   \
+    if (arrayCount > 0) {                                                                                              \
+        instance->arrayName = new std::vector<std::vector<arrayType> *>();                                             \
+        fori(arrayCount) { instance->arrayName->push_back(new std::vector<arrayType>()); }                             \
+    }
 
 byte bdb::ObjectDeclaration::regByte() {
     return byteCount++;
@@ -27,24 +33,63 @@ byte bdb::ObjectDeclaration::regLong() {
     return longCount++;
 }
 
+
+byte bdb::ObjectDeclaration::regByteArray() {
+    return byteArrayCount++;
+}
+
+byte bdb::ObjectDeclaration::regShortArray() {
+    return shortArrayCount++;
+}
+
+byte bdb::ObjectDeclaration::regIntArray() {
+    return intArrayCount++;
+}
+
+byte bdb::ObjectDeclaration::regFloatArray() {
+    return floatArrayCount++;
+}
+
+byte bdb::ObjectDeclaration::regDoubleArray() {
+    return doubleArrayCount++;
+}
+
+byte bdb::ObjectDeclaration::regLongArray() {
+    return longArrayCount++;
+}
+
+byte bdb::ObjectDeclaration::regObjectArray() {
+    return objectArrayCount++;
+}
+
+
 void bdb::ObjectDeclaration::reg() {
     declarations.push_back(this);
-    reference = declarations.size()-1;
+    id = declarations.size() - 1;
 }
 
 std::shared_ptr<bdb::ObjectInstance> bdb::ObjectDeclaration::newInstance(bool feelInstancesWithNulls) const {
-    auto instance = getInstance();
-    instance->reference = null_ref;
-    for (int i = 0; i < byteCount; ++i) instance->bytes.push_back(0);
-    for (int i = 0; i < shortCount; ++i) instance->shorts.push_back(0);
-    for (int i = 0; i < intCount; ++i) instance->integers.push_back(0);
-    for (int i = 0; i < floatCount; ++i) instance->floats.push_back(0);
-    for (int i = 0; i < doubleCount; ++i) instance->doubles.push_back(0);
-    for (int i = 0; i < longCount; ++i) instance->longs.push_back(0);
-    for (int i = 0; i < references.size(); i++) {
-        instance->instances.push_back(nullptrByDefault[i] || feelInstancesWithNulls ? nullptr : references[i]->newInstance());
+	auto instance = getInstance();
+	instance->reference = null_ref;
+	instance->bytes.resize(byteCount);
+	instance->shorts.resize(shortCount);
+    instance->integers.resize(intCount);
+    instance->floats.resize(floatCount);
+    instance->doubles.resize(doubleCount);
+    instance->longs.resize(longCount);
+    fori(references.size()) {
+        instance->objects.push_back(nullptrByDefault[i] || feelInstancesWithNulls ? nullptr
+                                                                                  : references[i]->newInstance());
     }
-    instance->parent = reference;
+
+    initArrays(signed_byte, byteArrays, byteArrayCount);
+    initArrays(short, shortArrays, shortArrayCount);
+    initArrays(int, intArrays, intArrayCount);
+    initArrays(float, floatArrays, floatArrayCount);
+    initArrays(double, doubleArrays, doubleArrayCount);
+    initArrays(long, longArrays, longArrayCount);
+    initArrays(std::shared_ptr<ObjectInstance>, objectArrays, objectArrayCount);
+    instance->parentId = id;
     return instance;
 }
 
@@ -53,4 +98,6 @@ byte bdb::ObjectDeclaration::regObject(ObjectDeclaration *objectDeclaration, boo
     nullptrByDefault.push_back(nullByDefault);
     return references.size() - 1;
 }
+
+
 
