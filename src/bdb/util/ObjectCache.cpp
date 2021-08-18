@@ -103,36 +103,15 @@ void bdb::ObjectCache::clear() {
     size = 0;
 }
 
-void bdb::ObjectCache::structureCacheToObjects(const ArrayBuffer &arrayBuffer) {
+void bdb::ObjectCache::structureCacheToObjects() {
     unsigned short byteVectorIndex = 0, shortVectorIndex = 0, intVectorIndex = 0, floatVectorIndex = 0,
                    doubleVectorIndex = 0, longVectorIndex = 0;
 
     auto declaration = declarations[declarationID];
-    unsigned int bufferIndex = 0;
 
     for (int i = 0; i < size; i++) {
-        unsigned short byteArrayIndex = 0, shortArrayIndex = 0, intArrayIndex = 0, floatArrayIndex = 0,
-                       doubleArrayIndex = 0, longArrayIndex = 0;
 
         auto instance = declaration->newInstance(true);
-
-        for (int j = 0; j < declaration->arrayCount; j++) {
-            auto type = buffer::get<byte>(&pointerArrayCache, bufferIndex);
-            auto pointer = buffer::get<unsigned short>(&pointerArrayCache, bufferIndex);
-
-            if (type == BYTE_ARRAY)
-                instance->byteArrays->at(byteArrayIndex++) = arrayBuffer.byteArrays[pointer];
-            else if (type == SHORT_ARRAY)
-                instance->shortArrays->at(shortArrayIndex++) = arrayBuffer.shortArrays[pointer];
-            else if (type == INT_ARRAY)
-                instance->intArrays->at(intArrayIndex++) = arrayBuffer.intArrays[pointer];
-            else if (type == FLOAT_ARRAY)
-                instance->floatArrays->at(floatArrayIndex++) = arrayBuffer.floatArrays[pointer];
-            else if (type == DOUBLE_ARRAY)
-                instance->doubleArrays->at(doubleArrayIndex++) = arrayBuffer.doubleArrays[pointer];
-            else if (type == LONG_ARRAY)
-                instance->longArrays->at(longArrayIndex++) = arrayBuffer.longArrays[pointer];
-        }
 
         for (int j = 0; j < declaration->byteCount; j++)
             instance->bytes[j] = bytes[byteVectorIndex++];
@@ -150,19 +129,61 @@ void bdb::ObjectCache::structureCacheToObjects(const ArrayBuffer &arrayBuffer) {
     }
 }
 
-void bdb::ObjectCache::flush(ObjectCache *pool) {
+void bdb::ObjectCache::flush(ObjectCache *pool, const ArrayBuffer &arrayBuffer) {
 
     auto declaration = declarations[declarationID];
     unsigned short objectVectorIndex = 0;
-    for (const auto &object : objects) {
+    unsigned int bufferIndex = 0;
+
+    for (const auto &instance : objects) {
+
+        unsigned short byteArrayIndex = 0, shortArrayIndex = 0, intArrayIndex = 0, floatArrayIndex = 0,
+                       doubleArrayIndex = 0, longArrayIndex = 0, objectArrayIndex = 0;
+        ;
+
         for (int j = 0; j < declaration->references.size(); j++) {
             if (instances[objectVectorIndex] == null_ref) {
-                object->objects[j] = nullptr;
+                instance->objects[j] = nullptr;
                 objectVectorIndex++;
                 continue;
             }
-            object->objects[j] = pool[parentInstances[objectVectorIndex]].objects[instances[objectVectorIndex]];
+            instance->objects[j] = pool[parentInstances[objectVectorIndex]].objects[instances[objectVectorIndex]];
             objectVectorIndex++;
+        }
+
+        for (int j = 0; j < declaration->arrayCount; j++) {
+            auto type = buffer::get<byte>(&pointerArrayCache, bufferIndex);
+            auto pointer = buffer::get<unsigned short>(&pointerArrayCache, bufferIndex);
+
+            if (type == BYTE_ARRAY)
+                instance->byteArrays->at(byteArrayIndex++) = arrayBuffer.byteArrays[pointer];
+            else if (type == SHORT_ARRAY)
+                instance->shortArrays->at(shortArrayIndex++) = arrayBuffer.shortArrays[pointer];
+            else if (type == INT_ARRAY)
+                instance->intArrays->at(intArrayIndex++) = arrayBuffer.intArrays[pointer];
+            else if (type == FLOAT_ARRAY)
+                instance->floatArrays->at(floatArrayIndex++) = arrayBuffer.floatArrays[pointer];
+            else if (type == DOUBLE_ARRAY)
+                instance->doubleArrays->at(doubleArrayIndex++) = arrayBuffer.doubleArrays[pointer];
+            else if (type == LONG_ARRAY)
+                instance->longArrays->at(longArrayIndex++) = arrayBuffer.longArrays[pointer];
+            else if (type == OBJECT_ARRAY) {
+                unsigned int index = 0;
+                while (arrayBuffer.serializedObjectPointerArrays[pointer]->size() != index) {
+                    auto array = arrayBuffer.serializedObjectPointerArrays[pointer];
+                    auto parentId = buffer::get<byte>(array, index);
+                    auto objectPointer = buffer::get<unsigned short>(array, index);
+
+                    std::shared_ptr<ObjectInstance> object;
+                    if (objectPointer == null_ref)
+                        object = nullptr;
+                    else
+                        object = pool[parentId].objects[objectPointer];
+
+                    instance->objectArrays->at(objectArrayIndex)->push_back(object);
+                }
+                objectArrayIndex++;
+            }
         }
     }
 }

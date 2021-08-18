@@ -4,3 +4,5 @@
 /cmake-build-release/
 /cmake-build-release/
 /build-test-Desktop-Debug/
+/CMakeLists.txt.user
+/.project/

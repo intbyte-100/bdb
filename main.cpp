@@ -6,32 +6,37 @@
 
 // clang-format off
 bdbClass(Entity,
-    bdbInts(a, b, c, d)
-    bdbReg()
+   bdbReg()
 );
 
+
+bdbClass(Test,
+    bdbInts(a, b, c, d, e)
+    bdbReg()
+)
 int main() {
+    //serialization tests:
+
     bdb::DataBuffer buffer;
 
-    Entity::object->regFloatArray();
-    Entity::object->regIntArray();
     Entity::object->regObjectArray();
     Entity::reg();
+    Test::reg();
+    
     bdb::update();
       
     auto obj = Entity::object->newInstance();
-
-    obj->objectArrays->at(0)->push_back(obj);
-    obj->intArrays->at(0)->push_back(3);
-    obj->intArrays->at(0)->push_back(3);
-    obj->intArrays->at(0)->push_back(3);
     
+    for (int i = 0; i < 100; i++) {
+        auto test = Test::object->newInstance();
+        Test::a(test) = 4;
+        Test::b(test) = 5;
+        Test::c(test) = 6;
+        obj->objectArrays->at(0)->push_back(test);
+    }
 
-    obj->floatArrays->at(0)->push_back(3);
-    obj->floatArrays->at(0)->push_back(3);
-    obj->floatArrays->at(0)->push_back(3);
     
-    obj->floatArrays->at(0)->push_back(3);
+    
     auto bytes = buffer.serialize(obj);
     auto object = buffer.deserialize(bytes, obj->parentId);
     

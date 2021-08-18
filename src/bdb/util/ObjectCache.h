@@ -33,9 +33,9 @@ namespace bdb {
 
         public:
         void put(const std::shared_ptr<ObjectInstance>& objectInstance, DataBuffer* buffer, std::vector<ObjectCache*>* objectPools);
-        void structureCacheToObjects(const ArrayBuffer &arrayBuffer);
+        void structureCacheToObjects();
         void clear();
-        void flush(ObjectCache *pool);
+        void flush(ObjectCache *pool, const ArrayBuffer &arrayBuffer);
         ~ObjectCache();
     };
 }

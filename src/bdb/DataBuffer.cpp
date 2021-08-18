@@ -139,7 +139,8 @@ std::shared_ptr<bdb::ObjectInstance> bdb::DataBuffer::deserialize(std::vector<by
                 else if (type == LONG_ARRAY)
                     desirializeArray<long>(&arrayBuffer, arrayBuffer.longArrays, size, &data, index);
                 else if (type == OBJECT_ARRAY)
-                    desirializeArray<byte>(&arrayBuffer, arrayBuffer.objectArrays, size * 3, &data, index);
+                    desirializeArray<byte>(
+                        &arrayBuffer, arrayBuffer.serializedObjectPointerArrays, size * 3, &data, index);
             }
         }
     }
@@ -193,9 +194,9 @@ std::shared_ptr<bdb::ObjectInstance> bdb::DataBuffer::deserialize(std::vector<by
     }
 
     for (auto i : usedPools)
-        i->structureCacheToObjects(arrayBuffer);
+        i->structureCacheToObjects();
     for (auto i : usedPools) {
-        i->flush(cache);
+        i->flush(cache, arrayBuffer);
     }
     return cache[declarationID].objects[0];
 }
