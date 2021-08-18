@@ -11,7 +11,8 @@ namespace bdb {
 		std::vector<std::vector<float> *> floatArrays;
 		std::vector<std::vector<double> *> doubleArrays;
 		std::vector<std::vector<long> *> longArrays;
-	};
+        std::vector<std::vector<byte> *> objectArrays;
+    };
 }
 
 

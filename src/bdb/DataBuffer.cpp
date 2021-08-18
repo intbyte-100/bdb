@@ -50,6 +50,7 @@ std::vector<byte> bdb::DataBuffer::serialize(const std::shared_ptr<bdb::ObjectIn
         mergeCache(FLOAT_ARRAY, floatArrayCount, floatArrayCache, wroteData);
         mergeCache(DOUBLE_ARRAY, doubleArrayCount, doubleArrayCache, wroteData);
         mergeCache(LONG_ARRAY, longArrayCount, longArrayCache, wroteData);
+        mergeCache(OBJECT_ARRAY, objectArrayCount, objectArrayCache, wroteData);
     }
 
     for (auto objectPool : objectPools) {
@@ -137,6 +138,8 @@ std::shared_ptr<bdb::ObjectInstance> bdb::DataBuffer::deserialize(std::vector<by
                     desirializeArray<double>(&arrayBuffer, arrayBuffer.doubleArrays, size, &data, index);
                 else if (type == LONG_ARRAY)
                     desirializeArray<long>(&arrayBuffer, arrayBuffer.longArrays, size, &data, index);
+                else if (type == OBJECT_ARRAY)
+                    desirializeArray<byte>(&arrayBuffer, arrayBuffer.objectArrays, size * 3, &data, index);
             }
         }
     }
@@ -214,10 +217,11 @@ bool bdb::DataBuffer::extraCacheIsEmpty() {
 
 unsigned short bdb::DataBuffer::extraCacheSize() {
     return byteArrayCache.size() + shortArrayCache.size() + intArrayCache.size() + floatArrayCache.size() +
-           doubleArrayCache.size() + longArrayCache.size() + (byteArrayCache.size() > 0 ? 3 : 0) +
-           (shortArrayCache.size() > 0 ? 3 : 0) + (intArrayCache.size() > 0 ? 3 : 0) +
-           (floatArrayCache.size() > 0 ? 3 : 0) + (doubleArrayCache.size() > 0 ? 3 : 0) +
-           (longArrayCache.size() > 0 ? 3 : 0);
+           doubleArrayCache.size() + longArrayCache.size() + objectArrayCache.size() +
+           (byteArrayCache.size() > 0 ? 3 : 0) + (shortArrayCache.size() > 0 ? 3 : 0) +
+           (intArrayCache.size() > 0 ? 3 : 0) + (floatArrayCache.size() > 0 ? 3 : 0) +
+           (doubleArrayCache.size() > 0 ? 3 : 0) + (longArrayCache.size() > 0 ? 3 : 0) +
+           (objectArrayCache.size() > 0 ? 3 : 0);
 }
 
 void bdb::DataBuffer::clear() {
@@ -234,5 +238,6 @@ void bdb::DataBuffer::clear() {
     floatArrayCount = 0;
     doubleArrayCount = 0;
     longArrayCount = 0;
+    objectArrayCount = 0;
 }
      

@@ -1,5 +1,7 @@
 #include "src/bdb/DataBuffer.h"
 #include "src/bdb/data_struct/ObjectDeclaration.h"
+#include <cassert>
+#define assertm(exp, msg) assert(((void)msg, exp)
 #include <iostream>
 
 // clang-format off
@@ -14,12 +16,11 @@ int main() {
     Entity::object->regFloatArray();
     Entity::object->regIntArray();
     Entity::object->regObjectArray();
-
     Entity::reg();
     bdb::update();
       
     auto obj = Entity::object->newInstance();
-    
+
     obj->objectArrays->at(0)->push_back(obj);
     obj->intArrays->at(0)->push_back(3);
     obj->intArrays->at(0)->push_back(3);

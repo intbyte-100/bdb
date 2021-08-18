@@ -34,8 +34,8 @@ void bdb::ObjectCache::serializeObjectArray(DataBuffer *buffer, std::vector<Obje
                     buffer::put((byte)0, arrayCache);
                     buffer::put(null_ref, arrayCache);
                 } else {
-                    put(object, buffer, cachePool);
-                    buffer::put(object->parentId, arrayCache);
+                    buffer->cache[object->parentId].put(object, buffer, cachePool);
+                    buffer::put((byte)object->parentId, arrayCache);
                     buffer::put((unsigned short)object->reference, arrayCache);
                 }
             }
@@ -48,8 +48,8 @@ void bdb::ObjectCache::serializeObjectArray(DataBuffer *buffer, std::vector<Obje
 
 void bdb::ObjectCache::put(const std::shared_ptr<ObjectInstance> &instance, DataBuffer *buffer,
                            std::vector<ObjectCache *> *objectPools) {
-    size++;
     if (instance->reference != null_ref) return;
+    size++;
     instance->reference = lastReference++;
     if (!usedBefore) {
         usedBefore = true;
