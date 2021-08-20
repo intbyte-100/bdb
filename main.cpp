@@ -27,7 +27,7 @@ int main() {
       
     auto obj = Entity::object->newInstance();
     
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 21845; i++) {
         auto test = Test::object->newInstance();
         Test::a(test) = 4;
         Test::b(test) = 5;

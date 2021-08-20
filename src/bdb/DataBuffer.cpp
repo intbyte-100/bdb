@@ -6,10 +6,9 @@
 #define putPrimitivesToBuffer(type_code, type, vector)                                                                 \
     if (!vector.empty()) {                                                                                             \
         buffer::put(type_code, &serializedObject);                                                                     \
-        buffer::put((unsigned short)vector.size(), &serializedObject);                                                 \
+        buffer::put((unsigned int)vector.size(), &serializedObject);                                                   \
         buffer::put<type>(&vector, &serializedObject);                                                                 \
     }
-
 
 void mergeCache(byte type, unsigned short arrayCount, std::vector<byte> &cache, std::vector<byte> &data) {
     if (arrayCount == 0)
@@ -27,7 +26,7 @@ std::vector<byte> bdb::DataBuffer::serialize(const std::shared_ptr<bdb::ObjectIn
     std::vector<byte> serializedObject;
 
     cache[objectInstance->parentId].put(objectInstance, this, &objectPools);
-
+    wroteData.push_back(bdb::version);
     if (!extraCacheIsEmpty()) {
         wroteData.push_back(255);
 
@@ -44,8 +43,8 @@ std::vector<byte> bdb::DataBuffer::serialize(const std::shared_ptr<bdb::ObjectIn
 
     for (auto objectPool : objectPools) {
         unsigned short id = objectPool->declarationID;
-        unsigned short size = declarations[id]->size * objectPool->size + declarations[id]->manifestSize +
-                              objectPool->pointerArrayCache.size() + (objectPool->pointerArrayCache.empty() ? 0 : 3);
+        unsigned int size = declarations[id]->size * objectPool->size + declarations[id]->manifestSize +
+                            objectPool->pointerArrayCache.size() + (objectPool->pointerArrayCache.empty() ? 0 : 5);
 
         serializedObject.clear();
         objectPool->usedBefore = false;
@@ -63,7 +62,7 @@ std::vector<byte> bdb::DataBuffer::serialize(const std::shared_ptr<bdb::ObjectIn
 
         if (!objectPool->instances.empty()) {
             buffer::put(OBJECT, &serializedObject);
-            buffer::put<unsigned short>(objectPool->instances.size(), &serializedObject);
+            buffer::put<unsigned int>(objectPool->instances.size(), &serializedObject);
             for (int i = 0; i < objectPool->instances.size(); i++) {
                 buffer::put(objectPool->parentInstances[i], &serializedObject);
                 buffer::put(objectPool->instances[i], &serializedObject);
@@ -72,7 +71,7 @@ std::vector<byte> bdb::DataBuffer::serialize(const std::shared_ptr<bdb::ObjectIn
 
         if (!objectPool->pointerArrayCache.empty()) {
             buffer::put(POINTER, &serializedObject);
-            buffer::put<unsigned short>(objectPool->pointerArrayCache.size(), &serializedObject);
+            buffer::put<unsigned int>(objectPool->pointerArrayCache.size(), &serializedObject);
             buffer::merge(&serializedObject, &objectPool->pointerArrayCache);
         }
 
@@ -99,13 +98,13 @@ void desirializeArray(bdb::ArrayBuffer *arrayBuffer,
 }
 
 std::shared_ptr<bdb::ObjectInstance> bdb::DataBuffer::deserialize(std::vector<byte> &data, byte declarationID) {
-    unsigned int index = 0;
+    unsigned int index = 1;
     std::vector<ObjectCache *> usedPools;
     ArrayBuffer arrayBuffer;
     updateCache();
 
-    if (data[0] == 255) {
-        index = 1;
+    if (data[index] == 255) {
+        index++;
         unsigned short extraCacheSize = buffer::get<unsigned short>(&data, index) + 2;
 
         while (index < extraCacheSize) {
@@ -140,7 +139,7 @@ std::shared_ptr<bdb::ObjectInstance> bdb::DataBuffer::deserialize(std::vector<by
         auto id = buffer::get<byte>(&data, bufferIndex);
 
         auto objectCount = buffer::get<unsigned short>(&data, bufferIndex);
-        auto size = buffer::get<unsigned short>(&data, bufferIndex);
+        auto size = buffer::get<unsigned int>(&data, bufferIndex);
         auto objectCache = &cache[id];
 
         objectCache->declarationID = id;
@@ -152,7 +151,7 @@ std::shared_ptr<bdb::ObjectInstance> bdb::DataBuffer::deserialize(std::vector<by
 
         while (bufferIndex != objectsLastIndex) {
             auto type = buffer::get<byte>(&data, bufferIndex);
-            unsigned short count = buffer::get<unsigned short>(&data, bufferIndex);
+            unsigned int count = buffer::get<unsigned int>(&data, bufferIndex);
 
             if (type == BYTE)
                 objectCache->bytes = buffer::get<signed_byte>(count, &data, bufferIndex);
