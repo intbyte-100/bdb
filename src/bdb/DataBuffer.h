@@ -11,7 +11,6 @@ namespace bdb {
         friend ObjectCache;
 
     private:
-        byte config = 0;
         ObjectCache *cache = nullptr;
         byte cacheInstancesCount = 0;
 
@@ -39,9 +38,6 @@ namespace bdb {
         void updateCache();
         std::vector<byte> serialize(const std::shared_ptr<ObjectInstance>& objectInstance);
         std::shared_ptr<ObjectInstance> deserialize(std::vector<byte> &data, byte declarationID);
-        void enable(byte attribute);
-        void disable(byte attribute);
-        bool isEnable(byte attribute);
         ~DataBuffer();
     };
 

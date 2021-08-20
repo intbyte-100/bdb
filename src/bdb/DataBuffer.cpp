@@ -10,17 +10,6 @@
         buffer::put<type>(&vector, &serializedObject);                                                                 \
     }
 
-void bdb::DataBuffer::enable(byte attribute) { config = config | attribute; }
-void bdb::DataBuffer::disable(byte attribute) { config &= ~attribute; }
-
-bool bdb::DataBuffer::isEnable(byte attribute) {
-    byte cfg = config;
-    if (attribute != COMPRESSING)
-        cfg &= ~COMPRESSING;
-    if (attribute != THIRTY_TWO_BIT_POINTERS)
-        cfg &= ~THIRTY_TWO_BIT_POINTERS;
-    return attribute == cfg;
-}
 
 void mergeCache(byte type, unsigned short arrayCount, std::vector<byte> &cache, std::vector<byte> &data) {
     if (arrayCount == 0)

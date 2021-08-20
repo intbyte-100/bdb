@@ -4,15 +4,16 @@
 #include "util/utils.h"
 
 unsigned short bdb::null_ref = 65535;
+const std::string bdb::stringVersion = "0.9.0";
 
 void bdb::update() {
-	for (auto declaration : declarations) {
-		declaration->size = declaration->byteCount + declaration->shortCount * sizeof(short) +
-							declaration->intCount * sizeof(int) + declaration->floatCount * sizeof(float) +
-							declaration->doubleCount * sizeof(double) +
-							declaration->longCount * sizeof(long) + declaration->references.size() * 3;
+    for (auto declaration : declarations) {
+        declaration->size = declaration->byteCount + declaration->shortCount * sizeof(short) +
+                            declaration->intCount * sizeof(int) + declaration->floatCount * sizeof(float) +
+                            declaration->doubleCount * sizeof(double) + declaration->longCount * sizeof(long) +
+                            declaration->references.size() * 3;
 
-		declaration->manifestSize =
+        declaration->manifestSize =
 			(declaration->byteCount != 0 ? 3 : 0) + (declaration->shortCount != 0 ? 3 : 0) +
 			(declaration->intCount != 0 ? 3 : 0) + (declaration->floatCount != 0 ? 3 : 0) +
 			(declaration->doubleCount != 0 ? 3 : 0) + (declaration->longCount != 0 ? 3 : 0) +

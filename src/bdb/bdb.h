@@ -2,7 +2,7 @@
 
 #include "util/macros_foreach.h"
 #include <cstdint>
-
+#include <string>
 
 #define bdbClass(name, code) namespace name { bdb::ObjectDeclaration *object = new bdb::ObjectDeclaration(); code}
 #define bdbVar(name) byte name;
@@ -108,11 +108,8 @@ typedef char signed_byte;
 
 namespace bdb {
 
-    const byte version = 1;
-
-    // flags
-    const byte COMPRESSING = 0x01;
-    const byte THIRTY_TWO_BIT_POINTERS = 0x02;
+    constexpr byte version = 1;
+    const extern std::string stringVersion;
 
     const byte BYTE = 0;
     const byte SHORT = 1;
@@ -138,4 +135,3 @@ namespace bdb {
 
     void update();
 }
-
