@@ -1,21 +1,17 @@
 #pragma once
 
 #define bdbAllocArray(type, size) __bdbAllocArray(size*sizeof(type))
-#define bdbLength(type, array) array->size/sizeof(type)
+#define bdbArrayLength(type, array) array->size/sizeof(type)
+#define bdbArrayElement(type, array, index) ((type*) &array->values[index*sizeof(type)])
 
 typedef struct
 {
     char *values;
     int size;
-} Array;
+} BdbArray;
 
-char* bdbGetChar(Array *array, int index);
-short* bdbGetShort(Array *array, int index);
-int* bdbGetInt(Array *array, int index);
-float* bdbGetFloat(Array *array, int index);
-double* bdbGetDouble(Array *array, int index);
-long* bdbGetLong(Array *array, int index);
 
-void bdbDeleteArray(Array *Array);
-Array* __bdbAllocArray(int size);
+
+void bdbDeleteArray(BdbArray* bdbArray);
+BdbArray* __bdbAllocArray(int size);
 

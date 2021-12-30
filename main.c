@@ -2,6 +2,8 @@
 #include "array.h"
 
 int main() {
-    Array* array = bdbAllocArray(int, 200);
+    BdbArray* array = bdbAllocArray(int, 200);
+    printf("array element = %i\n", *bdbArrayElement(int, array, 0));
+
     bdbDeleteArray(array);
 }

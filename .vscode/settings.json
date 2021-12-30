@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "array": "c",
+        "bitset": "c",
+        "type_traits": "c",
+        "valarray": "c"
+    }
+}

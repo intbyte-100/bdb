@@ -6,3 +6,6 @@
 /build-test-Desktop-Debug/
 CMakeLists.txt.user
 /.project/
+build
+.project
+bdb.kdev4

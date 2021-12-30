@@ -14,4 +14,6 @@ add_executable(bdb7
         main.c
         src/array.h
         src/array.c
+        src/list.h
+        src/list.c
 )
