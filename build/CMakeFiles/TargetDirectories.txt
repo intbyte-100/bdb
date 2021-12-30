@@ -1,0 +1,3 @@
+/home/intbyte/projects/bdb/build/CMakeFiles/bdb7.dir
+/home/intbyte/projects/bdb/build/CMakeFiles/edit_cache.dir
+/home/intbyte/projects/bdb/build/CMakeFiles/rebuild_cache.dir

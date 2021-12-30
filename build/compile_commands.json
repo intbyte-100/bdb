@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/intbyte/projects/bdb/build",
+  "command": "/sbin/cc  -I/home/intbyte/projects/bdb/bdb7 -I/home/intbyte/projects/bdb/src -g -std=gnu11 -o CMakeFiles/bdb7.dir/main.c.o -c /home/intbyte/projects/bdb/main.c",
+  "file": "/home/intbyte/projects/bdb/main.c"
+},
+{
+  "directory": "/home/intbyte/projects/bdb/build",
+  "command": "/sbin/cc  -I/home/intbyte/projects/bdb/bdb7 -I/home/intbyte/projects/bdb/src -g -std=gnu11 -o CMakeFiles/bdb7.dir/src/array.c.o -c /home/intbyte/projects/bdb/src/array.c",
+  "file": "/home/intbyte/projects/bdb/src/array.c"
+}
+]

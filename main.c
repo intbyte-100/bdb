@@ -1,5 +1,7 @@
 #include "stdio.h"
+#include "array.h"
 
 int main() {
-    printf("hello world\n");
+    Array* array = bdbAllocArray(int, 200);
+    bdbDeleteArray(array);
 }
