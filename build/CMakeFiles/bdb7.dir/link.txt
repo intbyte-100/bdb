@@ -1,1 +1,0 @@
-/sbin/cc -g CMakeFiles/bdb7.dir/main.c.o CMakeFiles/bdb7.dir/src/array.c.o -o bdb7 
