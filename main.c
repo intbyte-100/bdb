@@ -1,6 +1,6 @@
-#include "stdio.h"
 #include "array.h"
 #include "list.h"
+#include "stdio.h"
 
 int main() {
     BdbArray* array = bdbAllocArray(int, 200);
@@ -8,4 +8,7 @@ int main() {
     bdbDeleteArray(array);
 
     BdbList *list = bdbCreateList();
+    bdbAddElement(int, list, 3);
+    bdbAddAll(list, list);
+    bdbDeleteList(list);
 }

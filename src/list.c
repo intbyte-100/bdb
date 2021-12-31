@@ -1,5 +1,6 @@
 #include "list.h"
 #include "malloc.h"
+#include "memory.h"
 
 void __bdbExtendList(BdbList* list, int elementSize, int elementsCount)
 {
@@ -32,6 +33,24 @@ BdbList * bdbCreateList()
     list->array.values = malloc(14);
     list->array.size = 14;
     return list;
+}
+
+void bdbDeleteList(BdbList* list)
+{
+    free(list->array.values);
+    free(list);
+}
+
+void __bdbAddAllFromArray(BdbList* list, BdbArray* array)
+{
+    bdbExtendList(list, char, array->size);
+    memcpy(array->values, list->array.values+list->size-array->size, array->size);
+}
+
+void __bdbAddAllFromList(BdbList* list, BdbList* fromList)
+{
+    bdbExtendList(list, char, fromList->size);
+    memcpy(fromList->array.values, list->array.values+list->size, fromList->size);
 }
 
 
