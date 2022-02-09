@@ -23,7 +23,7 @@ void __bdbResizeList(BdbList* list, int newSize)
 char * __bdbAddElement(BdbList* list, int size)
 {
     __bdbExtendList(list, size, 1);
-    return &list->array.values[list->array.size - size];
+    return &list->array.values[list->size - size];
 }
 
 

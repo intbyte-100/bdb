@@ -16,4 +16,8 @@ add_executable(bdb7
         src/array.c
         src/list.h
         src/list.c
+        src/object.h
+        src/object.c
+        src/object_context.h
+        src/object_context.c
 )

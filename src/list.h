@@ -9,7 +9,7 @@
     BdbArray*:  __bdbAddAllFromArray, \
     BdbList*: __bdbAddAllFromList, \
     default: 0)(list, from)
-
+#define bdbListElement(type, list, index) bdbArrayElement(type, (&list->array), index)
 
 
 typedef struct 
